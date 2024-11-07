@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg rounded-lg">
+                <div class="card-header text-center">
+                    <h3>Order Confirmation</h3>
+                    <p class="text-muted">Thank you for your purchase!</p>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-3">Order ID: {{ order.id }}</h5>
+                    <p><strong>Date:</strong> {{ order.created_at.strftime('%B %d, %Y') }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ order.status.capitalize() }}
+                        </span>
+                    </p>
+
+                    <h5 class="mt-4">Order Items</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_items %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.product.price }}</td>
+                                <td>₹{{ item.quantity * item.product.price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between">
+                        <h4>Total Price: ₹{{ total_price }}</h4>
+                        <a href="{{ url_for('order_history') }}" class="btn btn-outline-secondary">Back to Orders</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

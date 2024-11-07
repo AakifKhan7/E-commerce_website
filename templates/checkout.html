@@ -1,0 +1,26 @@
+<!-- checkout.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Checkout</h2>
+
+  {% if order %}
+    <h3>Order Summary</h3>
+    <ul>
+        {% for item in order.items %}
+            <li>{{ item.product.name }} - Quantity: {{ item.quantity }} - Total: ${{ item.price * item.quantity }}</li>
+        {% endfor %}
+    </ul>
+
+    <p><strong>Total Amount: ${{ order.total_amount }}</strong></p>
+
+    <!-- Form to Proceed to Stripe Checkout -->
+    <form action="{{ url_for('create_checkout_session', order_id=order.id) }}" method="POST">
+        <button type="submit">Proceed to Checkout</button>
+    </form>
+
+  {% else %}
+    <p>Your order is invalid or not found. Please try again.</p>
+  {% endif %}
+
+{% endblock %}

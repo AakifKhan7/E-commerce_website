@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>Update Stock for "{{ product.name }}"</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('update_product_stock', product_id=product.id) }}">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group mb-4">
+                            <label for="name" class="form-label">Product Name</label>
+                            <input type="text" class="form-control-plaintext" id="name" value="{{ product.name }}" readonly>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="current_stock" class="form-label">Current Stock</label>
+                            <input type="number" class="form-control-plaintext" id="current_stock" value="{{ product.stocks }}" readonly>
+                        </div>
+                        <div class="form-group mb-4">
+                            {{ form.stocks.label(class="form-label") }}
+                            {{ form.stocks(class="form-control") }}
+                            {% for error in form.stocks.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100 mt-3">Update Stock</button>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

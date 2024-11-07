@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Add New Product</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.name.label }} {{ form.name(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.price.label }} {{ form.price(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.stocks.label }} {{ form.stocks(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label }} {{ form.description(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.detail.label }} {{ form.detail(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.category_id.label }} {{ form.category_id(class="form-control") }}
+            <small class="form-text text-muted">Or add a new category below.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.new_category.label }} {{ form.new_category(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.image.label }} {{ form.image(class="form-control-file") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label }}</button>
+    </form>
+</div>
+
+<style>
+    .container {
+        overflow: auto;
+        min-height: 80vh;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Order History</h2>
+{% if orders %}
+<ul class="list-group">
+    {% for order in orders %}
+    <li class="list-group-item">
+        Order #{{ order.id }} - Status: {{ order.status }}
+        <a href="{{ url_for('order_confirmation', order_id=order.id) }}" class="btn btn-info btn-sm float-end">View</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No orders found.</p>
+{% endif %}
+{% endblock %}
