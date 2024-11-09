@@ -5,10 +5,19 @@
     <h1 class="text-center mb-4 display-4">Our Amazing Products</h1>
     <p class="text-center lead mb-5">Browse through our exclusive collection of products with detailed descriptions, prices, and availability.</p>
     
+    <form action="{{ url_for('search') }}" method="GET" class="mb-5">
+        <div class="input-group shadow-sm" style="max-width: 600px; margin: 0 auto;">
+            <input type="text" name="query" class="form-control form-control-lg border-0 rounded-pill" placeholder="Search for products..." aria-label="Search for products" style="box-shadow: none;">
+            <button class="btn btn-primary btn-lg rounded-pill px-4 ms-2" type="submit" style="box-shadow: none;">
+                <i class="fas fa-search me-1"></i> Search
+            </button>
+        </div>
+    </form>
+
     <div class="row g-4">
         {% for product in products %}
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex align-items-stretch">
-            <div class="card shadow-lg border-light rounded">
+        <div class="col-xl-4 col-lg-4 col-md-6 col-12 d-flex align-items-stretch px-4">
+            <div class="card shadow-lg border-light rounded" style="width: 100%;">
                 <img src="{{ url_for('static', filename='uploads/' + product.image_url) }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
                 <div class="card-body">
                     <h5 class="card-title text-truncate" style="max-width: 200px;">{{ product.name }}</h5>

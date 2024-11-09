@@ -2,51 +2,53 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Add New Product</h2>
-    <form method="POST" enctype="multipart/form-data">
+    <h2 class="text-center mb-4">Add New Product</h2>
+    <form method="POST" enctype="multipart/form-data" class="shadow p-4 rounded-lg bg-light">
         {{ form.hidden_tag() }}
 
-        <div class="form-group">
-            {{ form.name.label }} {{ form.name(class="form-control") }}
+        <div class="form-group mb-3">
+            {{ form.name.label(class="form-label text-muted") }}
+            {{ form.name(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
         </div>
         
-        <div class="form-group">
-            {{ form.price.label }} {{ form.price(class="form-control") }}
+        <div class="form-group mb-3">
+            {{ form.price.label(class="form-label text-muted") }}
+            {{ form.price(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
         </div>
 
-        <div class="form-group">
-            {{ form.stocks.label }} {{ form.stocks(class="form-control") }}
+        <div class="form-group mb-3">
+            {{ form.stocks.label(class="form-label text-muted") }}
+            {{ form.stocks(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
         </div>
 
-        <div class="form-group">
-            {{ form.description.label }} {{ form.description(class="form-control") }}
+        <div class="form-group mb-3">
+            {{ form.description.label(class="form-label text-muted") }}
+            {{ form.description(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
         </div>
 
-        <div class="form-group">
-            {{ form.detail.label }} {{ form.detail(class="form-control") }}
+        <div class="form-group mb-3">
+            {{ form.detail.label(class="form-label text-muted") }}
+            {{ form.detail(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
         </div>
 
-        <div class="form-group">
-            {{ form.category_id.label }} {{ form.category_id(class="form-control") }}
+        <div class="form-group mb-3">
+            {{ form.category_id.label(class="form-label text-muted") }}
+            {{ form.category_id(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
             <small class="form-text text-muted">Or add a new category below.</small>
         </div>
 
-        <div class="form-group">
-            {{ form.new_category.label }} {{ form.new_category(class="form-control") }}
+        <div class="form-group mb-3">
+            {{ form.new_category.label(class="form-label text-muted") }}
+            {{ form.new_category(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
         </div>
 
-        <div class="form-group">
-            {{ form.image.label }} {{ form.image(class="form-control-file") }}
+        <div class="form-group mb-4">
+            {{ form.image.label(class="form-label text-muted") }}
+            {{ form.image(class="form-control form-control-lg shadow-sm border-0 rounded-pill") }}
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label }}</button>
+        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-sm transition-all hover-scale">{{ form.submit.label }}</button>
     </form>
 </div>
 
-<style>
-    .container {
-        overflow: auto;
-        min-height: 80vh;
-    }
-</style>
 {% endblock %}

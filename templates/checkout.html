@@ -1,26 +1,91 @@
-<!-- checkout.html -->
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Checkout</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Checkout</h2>
 
-  {% if order %}
-    <h3>Order Summary</h3>
-    <ul>
-        {% for item in order.items %}
-            <li>{{ item.product.name }} - Quantity: {{ item.quantity }} - Total: ${{ item.price * item.quantity }}</li>
-        {% endfor %}
-    </ul>
+    {% if order %}
+    <div class="card shadow-sm p-4 mb-4">
+        <h3 class="card-title">Order Summary</h3>
+        <ul class="list-group list-group-flush">
+            {% for item in order.items %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>{{ item.product.name }}</span>
+                <span>Quantity: {{ item.quantity }} - ${{ item.price * item.quantity }}</span>
+            </li>
+            {% endfor %}
+        </ul>
 
-    <p><strong>Total Amount: ${{ order.total_amount }}</strong></p>
+        <div class="d-flex justify-content-between mt-3">
+            <h5><strong>Total Amount:</strong></h5>
+            <h5 class="text-primary">${{ order.total_amount }}</h5>
+        </div>
 
-    <!-- Form to Proceed to Stripe Checkout -->
-    <form action="{{ url_for('create_checkout_session', order_id=order.id) }}" method="POST">
-        <button type="submit">Proceed to Checkout</button>
-    </form>
+        <div class="d-flex justify-content-center mt-4">
+            <form action="{{ url_for('create_checkout', order_id=order.id) }}" method="POST">
+                <button type="submit" class="btn btn-success btn-lg px-5 py-3 w-100 w-md-auto transition-all">Proceed to Checkout</button>
+            </form>
+        </div>
+    </div>
+    
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+        Your order is invalid or not found. Please try again.
+    </div>
+    {% endif %}
+</div>
 
-  {% else %}
-    <p>Your order is invalid or not found. Please try again.</p>
-  {% endif %}
+<style>
+    /* Make the page more visually appealing */
+    .card {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .list-group-item {
+        font-size: 1rem;
+        border: none;
+        padding: 15px;
+    }
+
+    .list-group-item span {
+        font-weight: 500;
+    }
+
+    .text-primary {
+        color: #007bff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+        font-size: 1.25rem;
+        text-transform: uppercase;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .transition-all:hover {
+        transform: scale(1.05);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .card {
+            margin: 0 15px;
+        }
+    }
+</style>
 {% endblock %}

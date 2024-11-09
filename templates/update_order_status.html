@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0 rounded-lg p-5">
+                <h2 class="text-center mb-4 display-5 text-primary">Update Order Status</h2>
+
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="text-muted">Order ID: <span class="text-dark">{{ order.id }}</span></h5>
+                        <p><strong>User:</strong> <span class="text-info">{{ order.user.name }}</span></p>
+                        <p><strong>Total Amount:</strong> <span class="text-success">${{ total_price }}</span></p>
+                    </div>
+
+                    <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="post">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-4">
+                            <label for="status" class="form-label text-dark"><strong>Order Status:</strong></label>
+                            {{ form.status(class="form-select form-select-lg rounded") }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill mt-3">Update Status</button>
+                    </form>
+                </div>
+
+                <div class="card-footer text-center mt-4">
+                    <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary rounded-pill">Back to Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

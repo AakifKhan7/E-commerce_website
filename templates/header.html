@@ -10,9 +10,20 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
                 </li>
+                {% if current_user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_orders') }}">Admin Orders</a>
+                </li>
+                {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('order_history') }}">Order History</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary mx-2" href="{{ url_for('cart') }}">View Cart</a>
+                </li>
+                {% endif %}
+
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
@@ -25,6 +36,7 @@
                     <a class="nav-link" href="{{ url_for('signup') }}">Sign Up</a>
                 </li>
                 {% endif %}
+
                 {% if current_user.is_admin %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>

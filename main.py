@@ -33,8 +33,12 @@ def admin_only(f):
 
 @app.route('/')
 def home():
-    print("Hello")
     products = Product.query.all()
+    try:
+        if current_user.id == 1:
+            return redirect('admin')
+    except AttributeError:
+        render_template('index.html', products=products)
     
     return render_template('index.html', products= products)
     # return 1
@@ -65,19 +69,6 @@ def signup():
 
         db.session.add(new_user)
         db.session.commit()
-
-        # new_address = Address(
-        #     user_id=new_user.id,
-        #     street=form.street.data,
-        #     city=form.city.data,
-        #     state=form.state.data,
-        #     zip_code=form.postal_code.data,
-        #     country=form.country.data,
-        #     phone_number=form.phone_number.data
-        # )
-
-        # db.session.add(new_address)
-        # db.session.commit()  # Commit the address
 
         login_user(new_user)
         flash('Account created and logged in successfully!', 'success')
@@ -121,31 +112,21 @@ def cart():
         return redirect(url_for('home'))
     
     total_amount = 0
+    cart_items = []
     order = None
 
     for product_id, quantity in session['cart'].items():
         product = Product.query.get(product_id)
         if product:
-            cart_items = CartItem(
-                product_id= product.id,
-                quantity =  quantity,
-                total_amount =  product.price * quantity
-            )
-            
-            
-            
-    # if current_user.is_authenticated:
-    #     order = Order(user_id=current_user.id, total_amount=total_amount, status='pending')
-    #     db.session.add(order)
-    #     db.session.commit() 
-        
-    #     for item in cart_items:
-    #         order_item = OrderItem(order_id=order.id, product_id=item['product'].id, quantity=item['quantity'], price=item['product'].price)
-    #         db.session.add(order_item)
-            
-    #     db.session.commit()
-        
-    #     return redirect(url_for('create_checkout', order_id=order.id))
+            item_total = product.price * quantity
+            total_amount += item_total
+            cart_item = {
+                'product_id': product.id,
+                'product_name': product.name,
+                'quantity': quantity,
+                'total_amount': item_total
+            }
+            cart_items.append(cart_item)
     
     return render_template('cart.html', cart_items=cart_items, total_amount=total_amount,  order=order)
 
@@ -153,23 +134,43 @@ def cart():
 @login_required
 def buy_now():
     if current_user.is_authenticated:
-        cart_items = CartItem.query.all()
-        # Calculate the total amount from the cart items
-        total_amount = sum(item['product'].price * item['quantity'] for item in cart_items)
+        if 'cart' not in session or not session['cart']:
+            flash('Your cart is empty.')
+            return redirect(url_for('cart'))
+        
 
-        # Create a new order for the authenticated user
+        
+        total_amount = 0
+        order_items = []
+        
+        for product_id, quantity in session['cart'].items():
+            product = Product.query.get(product_id)
+            if product:
+                item_total = product.price * quantity
+                total_amount += item_total
+                order_items.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'price': product.price
+                })
+
         order = Order(user_id=current_user.id, total_amount=total_amount, status='pending')
         db.session.add(order)
         db.session.commit()
         
-        # Add items from the cart to the OrderItem table
-        for item in cart_items:
-            order_item = OrderItem(order_id=order.id, product_id=item['product'].id, quantity=item['quantity'], price=item['product'].price)
+        for item in order_items:
+            order_item = OrderItem(
+                order_id=order.id,
+                product_id=item['product'].id,
+                quantity=item['quantity'],
+                price=item['price']
+            )
             db.session.add(order_item)
 
         db.session.commit()
+        session.pop('cart', None)
+        session.modified = True
 
-        # Redirect to the checkout session creation route
         return redirect(url_for('create_checkout', order_id=order.id))
 
     flash('Please log in to complete your purchase.')
@@ -185,13 +186,13 @@ def add_to_cart(product_id):
         return redirect(url_for('home'))
     
     try:
-        product_stocks = int(product.stocks)  # Convert to int if necessary
+        product_stocks = int(product.stocks)
     except (ValueError, TypeError):
         product_stocks = 0
         
-    # if not product or quantity > int(product.stocks):
-    #     flash('Product is not available.')
-    #     return redirect(url_for('home'))
+    if not product or quantity > product_stocks:
+        flash('Product is not available.')
+        return redirect(url_for('home'))
     
     if quantity > product_stocks:
         flash('Product is not available in the requested quantity.')
@@ -204,8 +205,11 @@ def add_to_cart(product_id):
 
     if product_id_str in session['cart']:
         session['cart'][product_id_str] += quantity
+        flash('Added to cart!')
+        
     else:
         session['cart'][product_id_str] = quantity
+        flash('Added to cart!')
 
     session.modified = True
     
@@ -214,8 +218,9 @@ def add_to_cart(product_id):
 
 @app.route('/remove-from-cart/<int:product_id>', methods=['POST'])
 def remove_from_cart(product_id):
-    if 'cart' in session and product_id in session['cart']:
-        del session['cart'][product_id]
+    product_id_str = str(product_id)
+    if 'cart' in session and product_id_str in session['cart']:
+        del session['cart'][product_id_str]
         session.modified = True 
     return redirect(url_for('cart'))
 
@@ -235,21 +240,50 @@ def order_confirmation(order_id):
 # ---------------------order - history------------------------ #
 # -------------------------------------------------------------#
 
-@app.route('/create-order', methods=['POST'])
+@app.route('/create-order/<int:product_id>', methods=['POST'])
 @login_required
-def create_order():
+def create_order(product_id):
     
-    order = Order(user_id=current_user.id, status='pending')
-    db.session.add(order)
-    db.session.commit()
+    # order = Order(user_id=current_user.id, status='pending')
+    # db.session.add(order)
+    # db.session.commit()
     
-    # Add order items
-    for product_id, quantity in session['cart'].items():
-        order_item = OrderItem(order_id=order.id, product_id=product_id, quantity=quantity)
+    # # Add order items
+    # for product_id, quantity in session['cart'].items():
+    #     order_item = OrderItem(order_id=order.id, product_id=product_id, quantity=quantity)
+    #     db.session.add(order_item)
+    
+    # db.session.commit()
+    # return render_template('checkout.html', order=order)
+    
+    print(f"Request method: {request.method}") 
+    if current_user.is_authenticated:
+        # if 'cart' not in session or not session['cart']:
+        #     flash('Your cart is empty.')
+        #     return redirect(url_for('cart'))
+        
+        product = Product.query.get(product_id)
+
+        order = Order(user_id=current_user.id, total_amount=product.price, status='pending')
+        db.session.add(order)
+        db.session.commit()
+        
+        order_item = OrderItem(
+            order_id=order.id,
+            product_id=product.id,
+            quantity=1,
+            price=product.price
+        )
         db.session.add(order_item)
-    
-    db.session.commit()
-    return redirect(url_for('order_history'))
+
+        db.session.commit()
+        session.pop('cart', None)
+        session.modified = True
+
+        return render_template('checkout.html', order=order)
+
+    flash('Please log in to complete your purchase.')
+    return redirect(url_for('cart'))
 
 @app.route('/order/history')
 def order_history():
@@ -262,23 +296,35 @@ def order_history():
 # -------------------------------------------------------------#
 
 
-@app.route('/create-checkout-session/<int:order_id>', methods=['POST'])
+@app.route('/create-checkout-session/<int:order_id>', methods=['GET', 'POST'])
 def create_checkout(order_id):
-    order = Order.query.get(order_id)
-    if not order or order.user_id != current_user.id:
-        flash('Order not found or invalid.', 'error')
-        return redirect(url_for('order_history'))
-    
-    session_id = create_checkout_session(order_id)
-    if session_id:
-        return redirect(f"https://checkout.stripe.com/pay/{session_id}")
-    flash('Order not found or invalid.', 'error')
-    return redirect(url_for('order_history'))
+    if request.method == 'POST':
+        session_url = create_checkout_session(order_id)
+        if session_url:
+            print(f"Redirecting to: {session_url}")
+            return redirect(session_url)
+        else:
+            flash("Checkout session creation failed.", "danger")
+            return redirect(url_for('cart'))
+    else:
+        # Handle GET request (if necessary)
+        order = Order.query.get(order_id)
+        if order:
+            return render_template('checkout.html', order=order)
+        else:
+            flash("Order not found.", "danger")
+            return redirect(url_for('cart'))
 
 @app.route('/payment-success/<int:order_id>', methods=['GET'])
 def payment_success(order_id):
+    order = Order.query.get(order_id)
+    if not order:
+        flash("Order not found.", "danger")
+        return redirect(url_for('home'))
     session_id = request.args.get('session_id')
     if confirm_payment(session_id):
+        order.status = 'paid'
+        db.session.commit()
         flash('Payment successful!', 'success')
     else:
         flash('Payment failed or was canceled.', 'error')
@@ -312,8 +358,6 @@ def search():
 @app.route('/admin')
 @admin_only
 def admin_dashboard():
-    # if not current_user.is_admin:
-    #     return redirect(url_for('home'))
     
     products = Product.query.all()
     users = User.query.all()
@@ -325,9 +369,6 @@ def admin_dashboard():
 @admin_only
 def update_product_stock(product_id):
     product = Product.query.get(product_id)
-    
-    # if not product or not current_user.is_admin:
-    #     return redirect(url_for('home'))
     
     form = UpdateProductForm()
     if form.validate_on_submit():
@@ -377,7 +418,7 @@ def add_product():
     return render_template('add_product.html', form=form)
 
 @app.route('/admin/product/edit/<int:product_id>', methods=['GET', 'POST'])
-@admin_only  # if needed for permissions
+@admin_only 
 def edit_product(product_id):
     product = Product.query.get_or_404(product_id)
     form = ProductForm(obj=product)
@@ -406,7 +447,18 @@ def edit_product(product_id):
 @admin_only
 def admin_orders():
     orders = Order.query.all()
-    return render_template('admin_orders.html', orders=orders)
+    orders_with_totals = []
+
+    for order in orders:
+        order_items = OrderItem.query.filter_by(order_id=order.id).all()
+        total_price = sum(item.quantity * item.price for item in order_items)
+        orders_with_totals.append({
+            'order': order,
+            'total_price': total_price,
+            'items': order_items
+        })
+
+    return render_template('admin_orders.html', orders=orders_with_totals)
 
 @app.route('/admin/order/update/<int:order_id>', methods=['GET', 'POST'])
 @admin_only
@@ -420,13 +472,27 @@ def update_order_status(order_id):
     if form.validate_on_submit():
         order.status = form.status.data
         db.session.commit()
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin_orders'))
     
     order_items = OrderItem.query.filter_by(order_id=order_id).all()
-    return render_template('update_order_status.html', form=form, order=order, order_items=order_items)
+    return render_template('update_order_status.html', form=form, order=order)
+
+@app.route('/admin/order/delete/<int:order_id>', methods=['POST'])
+@admin_only
+def delete_order(order_id):
+    order = Order.query.get(order_id)
+    
+    if order:
+        db.session.delete(order)
+        db.session.commit()
+        flash("Order deleted successfully", "success")
+    else:
+        flash("Order not found", "error")
+    
+    return redirect(url_for('admin_orders'))
 
 @app.route('/admin/product/delete/<int:product_id>', methods=['POST'])
-@admin_only  # if you have permission checks
+@admin_only
 def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
     db.session.delete(product)

@@ -60,7 +60,7 @@ class UpdateProductForm(FlaskForm):
 
 class UpdateOrderStatusForm(FlaskForm):
     status = SelectField("Order Status", choices=[
-        ("Pending", "Pending"),
+        ("pending", "pending"),
         ("Shipped", "Shipped"),
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled")
