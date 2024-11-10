@@ -2,9 +2,10 @@
 
 {% block content %}
 <div class="container mt-5">
+    
     <div class="row">
-        <div class="col-md-6">
-            <img src="{{ url_for('static', filename='images/' + product.image_url) }}" class="img-fluid rounded" alt="{{ product.name }}">
+        <div class="col-md-6 d-flex justify-content-center">
+            <img src="{{ url_for('static', filename='uploads/' + product.image_url) }}" class="img-fluid rounded" alt="{{ product.name }}" style="max-width: 400px;">
         </div>
         <div class="col-md-6">
             <h2>{{ product.name }}</h2>

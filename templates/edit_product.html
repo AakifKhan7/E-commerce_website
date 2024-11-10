@@ -3,32 +3,45 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center mb-4">Edit Product</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" class="p-4 rounded-3 shadow-lg bg-light">
         {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.name.label }} {{ form.name(class="form-control") }}
+        
+        <div class="form-group mb-4">
+            <label for="name" class="form-label fs-5 fw-semibold text-muted">{{ form.name.label }}</label>
+            {{ form.name(class="form-control border-2 border-primary shadow-none p-3") }}
         </div>
 
-        <div class="form-group">
-            {{ form.price.label }} {{ form.price(class="form-control") }}
+        <div class="form-group mb-4">
+            <label for="price" class="form-label fs-5 fw-semibold text-muted">{{ form.price.label }}</label>
+            {{ form.price(class="form-control border-2 border-primary shadow-none p-3") }}
         </div>
 
-        <div class="form-group">
-            {{ form.stocks.label }} {{ form.stocks(class="form-control") }}
+        <div class="form-group mb-4">
+            <label for="stocks" class="form-label fs-5 fw-semibold text-muted">{{ form.stocks.label }}</label>
+            {{ form.stocks(class="form-control border-2 border-primary shadow-none p-3") }}
         </div>
-        <div class="form-group">
-            {{ form.description.label }} {{ form.description(class="form-control") }}
+
+        <div class="form-group mb-4">
+            <label for="description" class="form-label fs-5 fw-semibold text-muted">{{ form.description.label }}</label>
+            {{ form.description(class="form-control border-2 border-primary shadow-none p-3") }}
         </div>
-        <div class="form-group">
-            {{ form.detail.label }} {{ form.detail(class="form-control") }}
+
+        <div class="form-group mb-4">
+            <label for="detail" class="form-label fs-5 fw-semibold text-muted">{{ form.detail.label }}</label>
+            {{ form.detail(class="form-control border-2 border-primary shadow-none p-3") }}
         </div>
-        <div class="form-group">
-            {{ form.category_id.label }} {{ form.category_id(class="form-control") }}
+
+        <div class="form-group mb-4">
+            <label for="category_id" class="form-label fs-5 fw-semibold text-muted">{{ form.category_id.label }}</label>
+            {{ form.category_id(class="form-select border-2 border-primary shadow-none p-3") }}
         </div>
-        <div class="form-group">
-            {{ form.image.label }} {{ form.image(class="form-control") }}
+
+        <div class="form-group mb-4">
+            <label for="image" class="form-label fs-5 fw-semibold text-muted">{{ form.image.label }}</label>
+            {{ form.image(class="form-control border-2 border-primary shadow-none p-3") }}
         </div>
-        <button type="submit" class="btn btn-primary">Update Product</button>
+
+        <button type="submit" class="btn btn-primary w-100 py-3 fs-5 fw-semibold mt-3 shadow-sm hover-shadow-lg">Update Product</button>
     </form>
 </div>
 {% endblock %}

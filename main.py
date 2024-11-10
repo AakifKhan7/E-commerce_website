@@ -2,7 +2,6 @@ from flask import abort, render_template, redirect, url_for, flash, request, ses
 from flask_login import login_user, LoginManager, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from dotenv import load_dotenv
 from forms import *
 from model import *
 from payment import *
@@ -244,23 +243,8 @@ def order_confirmation(order_id):
 @login_required
 def create_order(product_id):
     
-    # order = Order(user_id=current_user.id, status='pending')
-    # db.session.add(order)
-    # db.session.commit()
-    
-    # # Add order items
-    # for product_id, quantity in session['cart'].items():
-    #     order_item = OrderItem(order_id=order.id, product_id=product_id, quantity=quantity)
-    #     db.session.add(order_item)
-    
-    # db.session.commit()
-    # return render_template('checkout.html', order=order)
-    
     print(f"Request method: {request.method}") 
     if current_user.is_authenticated:
-        # if 'cart' not in session or not session['cart']:
-        #     flash('Your cart is empty.')
-        #     return redirect(url_for('cart'))
         
         product = Product.query.get(product_id)
 
@@ -307,7 +291,6 @@ def create_checkout(order_id):
             flash("Checkout session creation failed.", "danger")
             return redirect(url_for('cart'))
     else:
-        # Handle GET request (if necessary)
         order = Order.query.get(order_id)
         if order:
             return render_template('checkout.html', order=order)
@@ -323,11 +306,10 @@ def payment_success(order_id):
         return redirect(url_for('home'))
     session_id = request.args.get('session_id')
     if confirm_payment(session_id):
-        order.status = 'paid'
-        db.session.commit()
-        flash('Payment successful!', 'success')
+        flash('Payment successful, and stock has been updated!', 'success')
     else:
         flash('Payment failed or was canceled.', 'error')
+    
     return redirect(url_for('order_history'))
 
 @app.route('/payment-cancel/<int:order_id>', methods=['GET'])
@@ -397,7 +379,7 @@ def add_product():
         
         image_file = form.image.data
         filename = secure_filename(image_file.filename)
-        image_path = os.path.join('static/uploads', filename)
+        image_path = os.path.join('static', 'uploads', filename)    
         image_file.save(image_path)
         
         product = Product(
@@ -407,7 +389,7 @@ def add_product():
             detail=form.detail.data,
             category_id=category_id,
             price=form.price.data,
-            image_url=image_path
+            image_url=filename
         )
         
         db.session.add(product)
@@ -439,7 +421,7 @@ def edit_product(product_id):
             product.image_url = image_path
 
         db.session.commit()
-        return redirect(url_for('admin_dashboard'))  # or wherever you'd like to redirect
+        return redirect(url_for('admin_dashboard'))
     
     return render_template('edit_product.html', form=form, product=product)
 

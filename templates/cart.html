@@ -19,7 +19,7 @@
                 <tr>
                     <td>{{ item.product_name }}</td>
                     <td>{{ item.quantity }}</td>
-                    <td>₹{{ item.total_amount }}</td>
+                    <td>${{ item.total_amount }}</td>
                     <td>
                         <form action="{{ url_for('remove_from_cart', product_id=item.product_id) }}" method="post">
                             <button class="btn btn-danger">Remove</button>
@@ -31,7 +31,7 @@
         </table>
     </div>
 
-    <h4>Total Amount: ₹{{ total_amount }}</h4>
+    <h4>Total Amount: ${{ total_amount }}</h4>
     <form action="{{ url_for('buy_now') }}" method="post">
         <button class="btn btn-primary">Buy now</button>
     </form>

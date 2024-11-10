@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 stripe.api_key = os.getenv('STRIPE_API_KEY')
-print(os.getenv('STRIPE_API_KEY'))
 
 def create_checkout_session(order_id):
     order = Order.query.get(order_id)
@@ -52,9 +51,22 @@ def confirm_payment(session_id):
         
         if session.payment_status == 'paid':
             order = Order.query.get(session.client_reference_id)
-            order.status = 'paid'
-            db.session.commit()
-            return True
+            if order:
+                    for order_item in order.items:
+                        product = order_item.product  # Each order_item has a reference to the product
+                        if product and product.stocks >= order_item.quantity:
+                            product.stocks -= order_item.quantity  # Subtract the quantity purchased
+                            db.session.commit()  # Commit the changes to the database
+                        else:
+                            # If stock is insufficient, you can add a message or handle this case
+                            flash(f"Not enough stock for {product.name}.", "warning")
+                            return False
+        
+                    db.session.commit()
+                    return True
+            else:
+                flash("Order not found.", "danger")
+                return False
         
     except stripe.error.StripeError as e:
         flash(f"Stripe error: {str(e)}", "danger")
