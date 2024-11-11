@@ -40,18 +40,7 @@ class ProductOrderForm(FlaskForm):
     quantity = IntegerField("Quantity", validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField("Place Order")
 
-class PaymentForm(FlaskForm):
-    card_number = StringField("Card Number", validators=[DataRequired(), Length(min=16, max=16)])
-    expiration_date = StringField("Expiration Date (MM/YY)", validators=[DataRequired(), Length(min=5, max=5)])
-    cvv = StringField("CVV", validators=[DataRequired(), Length(min=3, max=3)])
-    billing_address = StringField("Billing Address", validators=[DataRequired(), Length(max=100)])
-    submit = SubmitField("Pay Now")
 
-class OrderConfirmationForm(FlaskForm):
-    order_id = IntegerField("Order ID", validators=[DataRequired()])
-    shipping_address = StringField("Shipping Address", validators=[DataRequired()])
-    total_amount = FloatField("Total Amount", validators=[DataRequired()])
-    submit = SubmitField("Confirm Order")
 
 class UpdateProductForm(FlaskForm):
     stocks = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=0)])
