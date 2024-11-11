@@ -35,11 +35,6 @@ class ProductForm(FlaskForm):
     
     submit = SubmitField('Submit')
     
-class ProductOrderForm(FlaskForm):
-    product_id = SelectField("Select Product", coerce=int, validators=[DataRequired()])
-    quantity = IntegerField("Quantity", validators=[DataRequired(), NumberRange(min=1)])
-    submit = SubmitField("Place Order")
-
 
 
 class UpdateProductForm(FlaskForm):
